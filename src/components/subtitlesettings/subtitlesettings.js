@@ -30,7 +30,8 @@ function getSubtitleAppearanceObject(context) {
         textWeight: context.querySelector('#selectTextWeight').value,
         dropShadow: context.querySelector('#selectDropShadow').value,
         font: context.querySelector('#selectFont').value,
-        textBackground: context.querySelector('#inputTextBackground').value,
+        textBackground: layoutManager.tv ? context.querySelector('#selectTextBackground').value : context.querySelector('#inputTextBackground').value,
+        textBackgroundEnabled: context.querySelector('#enableTextBackground').checked,
         textColor: layoutManager.tv ? context.querySelector('#selectTextColor').value : context.querySelector('#inputTextColor').value,
         verticalPosition: context.querySelector('#sliderVerticalPosition').value
     };
@@ -55,6 +56,8 @@ function loadForm(context, user, userSettings, appearanceSettings, apiClient) {
         context.querySelector('#selectTextWeight').value = appearanceSettings.textWeight || 'normal';
         context.querySelector('#selectDropShadow').value = appearanceSettings.dropShadow || '';
         context.querySelector('#inputTextBackground').value = appearanceSettings.textBackground || 'transparent';
+        context.querySelector('#selectTextBackground').value = appearanceSettings.textBackground || 'transparent';
+        context.querySelector('#enableTextBackground').checked = appearanceSettings.textBackgroundEnabled;
         context.querySelector('#selectTextColor').value = appearanceSettings.textColor || '#ffffff';
         context.querySelector('#inputTextColor').value = appearanceSettings.textColor || '#ffffff';
         context.querySelector('#selectFont').value = appearanceSettings.font || '';
@@ -173,6 +176,8 @@ function embed(options, self) {
     options.element.querySelector('#selectTextColor').addEventListener('change', onAppearanceFieldChange);
     options.element.querySelector('#inputTextColor').addEventListener('change', onAppearanceFieldChange);
     options.element.querySelector('#inputTextBackground').addEventListener('change', onAppearanceFieldChange);
+    options.element.querySelector('#selectTextBackground').addEventListener('change', onAppearanceFieldChange);
+    options.element.querySelector('#enableTextBackground').addEventListener('change', onAppearanceFieldChange);
 
     if (options.enableSaveButton) {
         options.element.querySelector('.btnSave').classList.remove('hide');
@@ -205,6 +210,9 @@ function embed(options, self) {
             // Replace color picker
             dom.parentWithTag(options.element.querySelector('#inputTextColor'), 'DIV').classList.add('hide');
             dom.parentWithTag(options.element.querySelector('#selectTextColor'), 'DIV').classList.remove('hide');
+
+            dom.parentWithTag(options.element.querySelector('#inputTextBackground'), 'DIV').classList.add('hide');
+            dom.parentWithTag(options.element.querySelector('#selectTextBackground'), 'DIV').classList.remove('hide');
         }
 
         options.element.querySelector('.chkPreview').addEventListener('change', (e) => {
