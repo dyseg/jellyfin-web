@@ -57,7 +57,7 @@ function getTextStyles(settings, preview) {
             break;
     }
 
-    const background = settings.textBackground || 'transparent';
+    const background = settings.textBackgroundEnabled && settings.textBackground || 'transparent';
     if (background) {
         list.push({ name: 'background-color', value: background });
     }
