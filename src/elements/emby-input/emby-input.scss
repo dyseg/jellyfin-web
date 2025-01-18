@@ -63,6 +63,10 @@
     margin-bottom: 0.25em;
 }
 
+.inputLabel:empty {
+    display: none;
+}
+
 .emby-input + .fieldDescription {
     margin-top: 0.25em;
 }
