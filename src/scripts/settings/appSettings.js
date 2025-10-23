@@ -260,6 +260,14 @@ class AppSettings {
         return this.get('aspectRatio') || '';
     }
 
+    requireDynamicAudioCompression(val) {
+        if (val !== undefined) {
+            return this.set('requireDynamicAudioCompression', val.toString());
+        }
+
+        return toBoolean(this.get('requireDynamicAudioCompression'), false);
+    }
+
     set(name, value, userId) {
         const currentValue = this.get(name, userId);
         localStorage.setItem(this.#getKey(name, userId), value);
