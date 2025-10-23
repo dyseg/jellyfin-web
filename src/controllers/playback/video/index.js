@@ -33,6 +33,7 @@ import LibraryMenu from '../../../scripts/libraryMenu';
 import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../../components/backdrop/backdrop';
 import { pluginManager } from '../../../components/pluginManager';
 import { PluginType } from '../../../types/plugin.ts';
+import appSettings from '../../../scripts/settings/appSettings';
 
 function getOpenedDialog() {
     return document.querySelector('.dialogContainer .dialog.opened');
@@ -1055,6 +1056,20 @@ export default function (view) {
         });
     }
 
+    function switchDynamicRangeCompression() {
+        const player = currentPlayer;
+        const currentState = appSettings.requireDynamicAudioCompression();
+        console.log('Toggling dynamic range compression from ' + currentState + ' to ' + !currentState);
+        appSettings.requireDynamicAudioCompression(!currentState);
+        const currentIndex = playbackManager.getAudioStreamIndex(player);
+        playbackManager.setAudioStreamIndex(currentIndex, player);
+        if (currentState) {
+            view.querySelector('.btnDynComp').classList.add('iconOsd-disabled');
+        } else {
+            view.querySelector('.btnDynComp').classList.remove('iconOsd-disabled');
+        }
+    }
+
     function showSecondarySubtitlesMenu(actionsheet, positionTo) {
         const player = currentPlayer;
         if (!playbackManager.playerHasSecondarySubtitleSupport(player)) return;
@@ -1959,6 +1974,10 @@ export default function (view) {
         playbackManager.fastForward(currentPlayer);
     });
     view.querySelector('.btnAudio').addEventListener('click', showAudioTrackSelection);
+    view.querySelector('.btnDynComp').addEventListener('click', switchDynamicRangeCompression);
+    if (!appSettings.requireDynamicAudioCompression()) {
+        view.querySelector('.btnDynComp').classList.add('iconOsd-disabled');
+    }
     view.querySelector('.btnSubtitles').addEventListener('click', showSubtitleTrackSelection);
 
     // HACK: Remove `emby-button` from the rating button to make it look like the other buttons

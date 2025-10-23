@@ -842,7 +842,8 @@ export default function (options) {
             MaxAudioChannels: physicalAudioChannels.toString(),
             MinSegments: browser.iOS || browser.osx ? '2' : '1',
             BreakOnNonKeyFrames: hlsBreakOnNonKeyFrames,
-            EnableAudioVbrEncoding: !appSettings.disableVbrAudio()
+            EnableAudioVbrEncoding: !appSettings.disableVbrAudio(),
+            RequireAudioDynamicRange: appSettings.requireDynamicAudioCompression()
         });
     }
 

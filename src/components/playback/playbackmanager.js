@@ -321,7 +321,8 @@ function getAudioStreamUrl(item, transcodingProfile, directPlayContainers, apiCl
         StartTimeTicks: startPosition || 0,
         EnableRedirection: true,
         EnableRemoteMedia: appHost.supports(AppFeature.RemoteAudio),
-        EnableAudioVbrEncoding: transcodingProfile.EnableAudioVbrEncoding
+        EnableAudioVbrEncoding: transcodingProfile.EnableAudioVbrEncoding,
+        RequireAudioDynamicRange: appSettings.requireDynamicAudioCompression()
     });
 }
 
@@ -497,6 +498,8 @@ async function getPlaybackInfo(player, apiClient, item, deviceProfile, mediaSour
     query.AlwaysBurnInSubtitleWhenTranscoding = appSettings.alwaysBurnInSubtitleWhenTranscoding();
 
     query.DeviceProfile = deviceProfile;
+
+    query.RequireAudioDynamicRange = appSettings.requireDynamicAudioCompression();
 
     const res = await mediaInfoApi.getPostedPlaybackInfo({ itemId: itemId, playbackInfoDto: query });
     return res.data;
@@ -2772,7 +2775,8 @@ export class PlaybackManager {
                         enableDirectPlay: null,
                         enableDirectStream: null,
                         allowVideoStreamCopy: null,
-                        allowAudioStreamCopy: null
+                        allowAudioStreamCopy: null,
+                        requireAudioDynamicRange: appSettings.requireDynamicAudioCompression()
                     };
 
                     return getPlaybackMediaSource(player, apiClient, deviceProfile, item, options.mediaSourceId, mediaOptions).then(function (mediaSource) {
