@@ -891,7 +891,7 @@ export default function (options) {
             MinSegments: browser.iOS || browser.osx ? '2' : '1',
             BreakOnNonKeyFrames: hlsBreakOnNonKeyFrames,
             EnableAudioVbrEncoding: !appSettings.disableVbrAudio(),
-            RequireAudioDynamicRange: appSettings.requireDynamicAudioCompression()
+            RequireAudioDynamicRange: true
         });
     }
 
