@@ -83,6 +83,8 @@ const DeviceCard = ({ device }: DeviceCardProps) => {
 
     const showPlaybackInfo = useCallback(() => {
         const displayPlayMethod = playmethodhelper.getDisplayPlayMethod(device);
+        const transcodeReasons = device.TranscodingInfo?.TranscodeReasons as string[] | undefined;
+        let title;
 
         switch (displayPlayMethod) {
             case 'Remux':
@@ -90,7 +92,11 @@ const DeviceCard = ({ device }: DeviceCardProps) => {
                 setPlaybackInfoDesc(globalize.translate('RemuxHelp1') + '\n' + globalize.translate('RemuxHelp2'));
                 break;
             case 'DirectStream':
-                setPlaybackInfoTitle(globalize.translate('DirectStreaming'));
+                title = globalize.translate('DirectStreaming');
+                if (transcodeReasons?.includes('RequireAudioDynamicRange')) {
+                    title += ' + ' + globalize.translate('DynamicRangeCompression');
+                }
+                setPlaybackInfoTitle(title);
                 setPlaybackInfoDesc(globalize.translate('DirectStreamHelp1') + '\n' + globalize.translate('DirectStreamHelp2'));
                 break;
             case 'DirectPlay':
@@ -98,7 +104,6 @@ const DeviceCard = ({ device }: DeviceCardProps) => {
                 setPlaybackInfoDesc(globalize.translate('DirectPlayHelp'));
                 break;
             case 'Transcode': {
-                const transcodeReasons = device.TranscodingInfo?.TranscodeReasons as string[] | undefined;
                 const localizedTranscodeReasons = transcodeReasons?.map(transcodeReason => globalize.translate(transcodeReason)) || [];
                 setPlaybackInfoTitle(globalize.translate('Transcoding'));
                 setPlaybackInfoDesc(
