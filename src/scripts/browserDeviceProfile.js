@@ -304,6 +304,25 @@ function supportedDolbyVisionProfileAv1(videoTestElement) {
     return videoTestElement.canPlayType?.('video/mp4; codecs="dav1.10.06"').replace(/no/, '');
 }
 
+function supportsAnamorphicVideo() {
+    // Most modern browsers/platforms correctly apply SAR (Sample Aspect Ratio) during playback,
+    // stretching non-square pixels to the correct display aspect ratio.
+    //
+    // Tizen 6+ confirmed working in commit 08f8b2d2f. WebOS 5+ is similar (2020+ LG TVs).
+    // Desktop browsers, Edge UWP (Xbox), and mobile platforms all handle anamorphic correctly.
+    //
+    // Platforms NOT included (need testing): vidaa, hisense, ps4, titanos, operaTv, vega
+    return browser.tizenVersion >= 6
+        || browser.web0sVersion >= 5
+        || browser.chrome
+        || browser.firefox
+        || browser.safari
+        || browser.edgeChromium
+        || browser.edgeUwp
+        || browser.iOS
+        || browser.android;
+}
+
 function getDirectPlayProfileForVideoContainer(container, videoAudioCodecs, videoTestElement, options) {
     let supported = false;
     let profileContainer = container;
@@ -400,8 +419,6 @@ function getGlobalMaxVideoBitrate() {
     let bitrate = null;
     if (browser.ps4) {
         bitrate = 8000000;
-    } else if (browser.xboxOne) {
-        bitrate = 12000000;
     } else if (browser.tizen && isTizenFhd) {
         bitrate = 20000000;
     }
@@ -660,7 +677,7 @@ export default function (options) {
     const hlsInFmp4VideoCodecs = [];
 
     if (canPlayAv1(videoTestElement)
-        && (browser.safari || (!browser.mobile && (browser.edgeChromium || browser.firefox || browser.chrome || browser.opera)))) {
+        && (browser.safari || browser.tizen || browser.web0s || (!browser.mobile && (browser.edgeChromium || browser.firefox || browser.chrome || browser.opera)))) {
         // disable av1 on non-safari mobile browsers since it can be very slow software decoding
         hlsInFmp4VideoCodecs.push('av1');
     }
@@ -1260,12 +1277,6 @@ export default function (options) {
 
     const h264CodecProfileConditions = [
         {
-            Condition: 'NotEquals',
-            Property: 'IsAnamorphic',
-            Value: 'true',
-            IsRequired: false
-        },
-        {
             Condition: 'EqualsAny',
             Property: 'VideoProfile',
             Value: h264Profiles,
@@ -1286,12 +1297,6 @@ export default function (options) {
     ];
 
     const hevcCodecProfileConditions = [
-        {
-            Condition: 'NotEquals',
-            Property: 'IsAnamorphic',
-            Value: 'true',
-            IsRequired: false
-        },
         {
             Condition: 'EqualsAny',
             Property: 'VideoProfile',
@@ -1323,12 +1328,6 @@ export default function (options) {
 
     const av1CodecProfileConditions = [
         {
-            Condition: 'NotEquals',
-            Property: 'IsAnamorphic',
-            Value: 'true',
-            IsRequired: false
-        },
-        {
             Condition: 'EqualsAny',
             Property: 'VideoProfile',
             Value: av1Profiles,
@@ -1347,6 +1346,29 @@ export default function (options) {
             IsRequired: false
         }
     ];
+
+    if (!supportsAnamorphicVideo()) {
+        h264CodecProfileConditions.push({
+            Condition: 'NotEquals',
+            Property: 'IsAnamorphic',
+            Value: 'true',
+            IsRequired: false
+        });
+
+        hevcCodecProfileConditions.push({
+            Condition: 'NotEquals',
+            Property: 'IsAnamorphic',
+            Value: 'true',
+            IsRequired: false
+        });
+
+        av1CodecProfileConditions.push({
+            Condition: 'NotEquals',
+            Property: 'IsAnamorphic',
+            Value: 'true',
+            IsRequired: false
+        });
+    }
 
     if (!browser.edgeUwp && !browser.tizen && !browser.web0s) {
         h264CodecProfileConditions.push({
@@ -1387,7 +1409,7 @@ export default function (options) {
         });
     }
 
-    const globalMaxVideoBitrate = (getGlobalMaxVideoBitrate() || '').toString();
+    const globalMaxVideoBitrate = (options.globalMaxVideoBitrate || getGlobalMaxVideoBitrate() || '').toString();
 
     const h264MaxVideoBitrate = globalMaxVideoBitrate;
 
@@ -1504,10 +1526,13 @@ export default function (options) {
     });
 
     if (browser.web0s && supportsDolbyVision(options)) {
-        // Disallow direct playing of DOVI media in containers not ts or mp4.
+        // Adjust DOVI container rules based on WebOS version.
+        // On WebOS 25 and newer, mp4, ts, and mkv containers are allowed.
+        // On WebOS 24 and lower, only mp4 and ts containers are allowed.
+        const allowedContainers = browser.web0sVersion >= 25 ? ['mp4', 'ts', 'mkv'] : ['mp4', 'ts'];
         profile.CodecProfiles.push({
             Type: 'Video',
-            Container: '-mp4,ts',
+            Container: '-' + allowedContainers.join(','),
             Codec: 'hevc',
             Conditions: [
                 {
@@ -1591,6 +1616,11 @@ export default function (options) {
             && subtitleBurninSetting !== 'allcomplexformats' && subtitleBurninSetting !== 'onlyimageformats') {
             profile.SubtitleProfiles.push({
                 Format: 'pgssub',
+                Method: 'External'
+            });
+            profile.SubtitleProfiles.push({
+                Format: 'vobsub',
+                Container: 'mks',
                 Method: 'External'
             });
         }
