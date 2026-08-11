@@ -1097,7 +1097,7 @@
     "EveryXHours": "每 {0} 小时",
     "EveryHour": "每小时",
     "EveryXMinutes": "每 {0} 分钟",
-    "WriteAccessRequired": "Jellyfin需要此文件夹的写入权限。请确认是否拥有写入权限并重试。",
+    "WriteAccessRequired": "Jellyfin 需要此文件夹的写入权限。请确认是否拥有写入权限并重试。",
     "PathNotFound": "无法找到此路径。请确认路径有效并重试。",
     "Yadif": "Yet Another 去隔行滤镜（YADIF）",
     "LabelDeinterlaceMethod": "反交错方法",
@@ -1888,7 +1888,7 @@
     "StreamingLoadError": "流媒体传输页面设置加载失败",
     "Unwatch": "取消日志跟踪",
     "UsersEditPageError": "用户编辑页面加载失败",
-    "Watch": "观看",
+    "Watch": "开启日志跟踪",
     "TrickplayLoadError": "进度条预览图设置加载失败",
     "LabelExternalServerUriHelp": "用于外部访问的已发布服务器 URI。",
     "ActivitiesLoadError": "加载活动记录失败",
@@ -1939,5 +1939,9 @@
     "BitmapSubtitleAspectModeStretch": "拉伸",
     "LabelBitmapSubtitleAspectMode": "位图字幕纵横比模式",
     "LabelUsernameAllowedCharactersHelp": "用户名可以包含字母、数字、空格以及以下字符：- _ ' . @ +。用户名不能以空格开头或结尾。",
-    "BitmapSubtitleAspectModeContain": "适应"
+    "BitmapSubtitleAspectModeContain": "适应",
+    "Novel": "小说",
+    "Screenplay": "剧本",
+    "HlsAudioSeekStrategy": "HLS 流跳转所使用的策略。",
+    "LabelHlsAudioSeekStrategy": "音频跳转策略。"
 }
